@@ -344,6 +344,7 @@
                 position: static;
                 margin: 10px 0;
                 text-align: left;
+                width: 100%;
             }
             .difficulty-select,
             .case-color-select {
@@ -353,18 +354,25 @@
             }
             .bet-size-container {
                 display: flex;
+                flex-direction: row;
                 align-items: center;
-                justify-content: flex-start;
-            }
-            .bet-size-input {
+                gap: 5px;
+                margin: 10px;
                 position: static;
-                width: 80px;
-                margin-right: 10px;
             }
+            .bet-size-input,
             .bet-size-button,
             .bet-size-button-1 {
                 position: static;
-                margin-right: 10px;
+                margin: 0;
+            }
+            .bet-size-input {
+                width: 80px;
+            }
+            .bet-size-button,
+            .bet-size-button-1 {
+                min-width: 40px;
+                height: 33px;
             }
             .back-button {
                 top: 10px;
