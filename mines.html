@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>Mines Assistant</title>
+  <style>
+    :root {
+      --background: 220 100% 1%;
+      --foreground: 220 100% 97%;
+      --muted: 220 51% 36%;
+      --muted-foreground: 220 100% 97%;
+      --popover: 220 70% 12%;
+      --popover-foreground: 220 100% 97%;
+      --card: 220 70% 12%;
+      --card-foreground: 220 100% 97%;
+      --border: 220 51% 36%;
+      --input: 220 51% 36%;
+      --primary: 220 73% 63%;
+      --primary-foreground: 220 89% 99%;
+      --secondary: 220 51% 36%;
+      --secondary-foreground: 220 100% 97%;
+      --accent: 220 51% 36%;
+      --accent-foreground: 220 100% 97%;
+      --destructive: 0 62.8% 30.6%;
+      --destructive-foreground: 0 0% 98%;
+      --ring: 220 73% 63%;
+      --radius: 0.75rem;
+    }
+
+    body, html {
+      cursor: none;
+      margin: 0;
+      background: linear-gradient(135deg, 
+        hsl(220, 100%, 1%) 0%,
+        hsl(220, 70%, 12%) 50%,
+        hsl(220, 100%, 1%) 100%
+      );
+      color: #ecf0f1;
+      font-family: Arial, sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(circle at 20% 20%, hsla(220, 73%, 63%, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, hsla(220, 73%, 63%, 0.1) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::after {
+      display: none;
+    }
+
+    .container {
+      position: absolute;
+      z-index: 1;
+      text-align: center;
+      width: 100%;
+      margin: 0;
+      text-shadow: 0 0 10px rgba(255,255,255,0.4),
+                   0 0 20px rgba(255,255,255,0.3),
+                   0 0 30px rgba(255,255,255,0.2);
+      min-height: calc(100vh - 100px);
+      background: transparent;
+      top: 0;
+      left: 0;
+    }
+
+    .wrapper {
+      position: relative;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .controls {
+      position: relative;
+      z-index: 2;
+      margin: 20px 0;
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    button {
+      position: relative;
+      z-index: 4;
+      padding: 10px 20px;
+      border: 2px solid white;
+      border-radius: 10px;
+      background-color: rgba(44, 62, 80, 0.8);
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      margin-left: 10px;
+    }
+
+    button:hover {
+      background-color: white;
+      color: black;
+    }
+
+    .stats {
+      position: relative;
+      z-index: 2;
+      margin: 20px 0;
+      padding: 15px;
+      background: hsla(var(--card), 0.7);
+      border-radius: var(--radius);
+      border: 1px solid hsl(var(--primary));
+      color: hsl(var(--foreground));
+    }
+
+    .stats p {
+      margin: 5px 0;
+      text-shadow: 0 0 5px hsla(var(--primary), 0.5);
+    }
+
+    .site-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      color: white;
+      font-size: 16px;
+      background: none;
+      padding: 10px 0;
+      margin: 0;
+      text-shadow: 0 0 10px white, 0 0 20px white, 0 0 30px white;
+      z-index: 1000;
+    }
+
+    /* Remove content-wrapper and z-index related styles */
+    .content-wrapper {
+      display: none;
+    }
+
+    h1 {
+      margin: 20px 0;
+      text-shadow: 0 0 10px hsla(var(--primary), 0.8);
+      color: hsl(var(--foreground));
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      margin: 20px auto;
+      max-width: 500px;
+    }
+
+    .cell {
+      position: relative;
+      z-index: 5;
+      width: 50px;
+      height: 50px;
+      background-color: transparent;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .cell.mine {
+      background-image: url('bomb.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+
+    .cell.diamond {
+      background-image: url('diamond.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      border: 2px solid lime;
+      animation: diamondPulse 2s 2;
+    }
+
+    .cell.defaultDiamond {
+      background-image: url('diamond.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+
+    .cell:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 15px hsla(var(--primary), 0.5);
+      background-color: transparent;
+    }
+
+    .cell.mine:hover {
+      background-image: url('bomb.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-color: transparent;
+    }
+
+    .cell.diamond:hover {
+      transform: translateY(-2px) scale(1.1);
+      box-shadow: 0 0 20px lime;
+    }
+
+    .cell.defaultDiamond:hover {
+      background-image: url('diamond.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-color: transparent;
+    }
+
+    .cursor {
+      position: fixed;
+      width: 20px;
+      height: 20px;
+      background: radial-gradient(circle, rgba(255,255,255,0.8), rgba(255,255,255,0));
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      mix-blend-mode: difference;
+    }
+
+    .trail {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      background: radial-gradient(circle, rgba(255,255,255,0.6), rgba(255,255,255,0));
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      mix-blend-mode: difference;
+      animation: fadeOut 0.5s forwards;
+    }
+
+    @keyframes fadeOut {
+      to {
+        opacity: 0;
+        transform: scale(0.5);
+      }
+    }
+
+    @keyframes pageTransitionOut {
+      to {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+    }
+
+    @keyframes diamondPulse {
+      0% {
+        transform: scale(1);
+        box-shadow: 0 0 10px lime;
+      }
+      50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 20px lime;
+      }
+      100% {
+        transform: scale(1);
+        box-shadow: 0 0 10px lime;
+      }
+    }
+
+    /* Social links removed */
+    .header-links {
+      display: none;
+    }
+
+    /* Announcement is visible by default (for mobile) but will be hidden on desktop below */
+    .announcement {
+      margin-top: 80px;
+      padding: 20px 0;
+      font-size: 2em;
+      font-weight: bold;
+      text-align: center;
+      width: 100%;
+      background-color: black; 
+      color: #ecf0f1;
+      display: none;
+    }
+
+    #minesBoard {
+      position: relative;
+      z-index: 4;
+      display: grid;
+      grid-template-columns: repeat(5, 50px);
+      grid-gap: 5px;
+      margin-top: 20px;
+      justify-content: center;
+    }
+
+    #minesForm {
+      position: relative;
+      z-index: 3;
+      margin-bottom: -100px;
+    }
+
+    input[type="number"] {
+      position: relative;
+      z-index: 4;
+      margin: 0 10px;
+      padding: 5px;
+      border: 1px solid rgba(189, 195, 199, 0.5);
+      border-radius: 3px;
+      width: 100px;
+      background-color: rgba(44, 62, 80, 0.8);
+      color: white;
+    }
+
+    button:disabled {
+      background-color: hsla(var(--muted), 0.5);
+      color: hsl(var(--muted-foreground));
+      cursor: not-allowed;
+    }
+
+    .multiplier-container {
+      position: relative;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      margin-left: 975px;
+      margin-top: 30px;
+    }
+
+    #multiplier {
+      margin-left: 75px;
+    }
+
+    #generatePatternButton {
+      margin-top: 10px;
+    }
+
+    #backButton {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background-color: transparent;
+      cursor: pointer;
+      border: 0;
+      width: 56px;
+      height: 56px;
+      margin: 0;
+      overflow: hidden;
+      outline: none;
+      z-index: 1001;
+    }
+
+    .button {
+      position: relative;
+      background: transparent;
+      border: none;
+      width: 56px;
+      height: 56px;
+      padding: 0;
+      margin: 0;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .button:before,
+    .button:after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      inset: 7px;
+    }
+
+    .button:before {
+      border: 4px solid #f0eeef;
+      transition: opacity 0.4s cubic-bezier(0.77, 0, 0.175, 1) 80ms,
+        transform 0.5s cubic-bezier(0.455, 0.03, 0.515, 0.955) 80ms;
+    }
+
+    .button:after {
+      border: 4px solid #96daf0;
+      transform: scale(1.3);
+      transition: opacity 0.4s cubic-bezier(0.165, 0.84, 0.44, 1),
+        transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      opacity: 0;
+    }
+
+    .button:hover:before,
+    .button:focus:before {
+      opacity: 0;
+      transform: scale(0.7);
+      transition: opacity 0.4s cubic-bezier(0.165, 0.84, 0.44, 1),
+        transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .button:hover:after,
+    .button:focus:after {
+      opacity: 1;
+      transform: scale(1);
+      transition: opacity 0.4s cubic-bezier(0.77, 0, 0.175, 1) 80ms,
+        transform 0.5s cubic-bezier(0.455, 0.03, 0.515, 0.955) 80ms;
+    }
+
+    .button-box {
+      display: flex;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    .button-elem {
+      display: block;
+      width: 20px;
+      height: 20px;
+      margin: 17px 18px 0 18px;
+      transform: rotate(180deg);
+      fill: #f0eeef;
+    }
+
+    .button:hover .button-box,
+    .button:focus .button-box {
+      transition: 0.4s;
+      transform: translateX(-56px);
+    }
+
+    /* New mobile-specific wrappers for reordering the form elements */
+    .mobile-row {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      margin: 5px 0;
+    }
+
+    /* On desktop, these wrappers won't affect layout */
+    @media only screen and (min-width: 769px) {
+      .mobile-row {
+        display: contents;
+      }
+      /* Hide announcement on desktop */
+      .announcement {
+        display: none;
+      }
+      /* Increase mines board and result size on desktop (adjusted) */
+      #minesBoard {
+        grid-template-columns: repeat(5, 60px);
+        grid-gap: 8px;
+      }
+      .cell {
+        width: 60px;
+        height: 60px;
+      }
+      /* Move mines results a bit further down on desktop */
+      #minesResults {
+        font-size: 1.3em;
+        margin-top: 20px;
+      }
+    }
+
+    /* Mobile Styles (only active on screens 768px wide or less) */
+    @media only screen and (max-width: 768px) {
+      /* Only header links are removed on mobile; announcement remains visible */
+      .header-links {
+        display: none;
+      }
+      /* Ensure mobile container does not cause horizontal scrolling */
+      .container {
+        width: 100%;
+        padding: 0 10px;
+      }
+      /* Reorder form elements */
+      #minesForm {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      /* Grouped mobile rows */
+      .bet-row button,
+      .board-row button {
+        margin: 0 5px;
+      }
+      /* Adjust input sizes */
+      input[type="number"] {
+        width: 60px;
+        margin: 5px;
+      }
+      button {
+        padding: 8px 15px;
+        margin: 5px;
+      }
+      /* Reduce multiplier left margin */
+      .multiplier-container {
+        margin: 20px auto;
+        width: auto;
+      }
+      #multiplier {
+        margin-left: 0;
+      }
+       #backButton {
+        width: 45px;
+        height: 45px;
+        font-size: 24px;
+      }
+      .site-footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        z-index: 100;
+      }
+      /* Move the mines board further down on mobile */
+      #minesBoard {
+        margin-top: 100px;
+      }
+      /* Move header up on mobile */
+      .header {
+        margin-top: 10px;
+      }
+    }
+
+    #minesResults {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    #minesResults strong {
+      margin-right: 5px;
+    }
+
+    #minesResults span {
+      margin-right: 20px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Social links removed -->
+  <div class="header-links">
+    <!-- This block is hidden on all devices -->
+  </div>
+
+  <div class="announcement">
+    <strong>Updates Posted in Discord</strong>
+  </div>
+
+  <button class="button" id="backButton">
+    <div class="button-box">
+      <span class="button-elem">
+        <svg viewBox="0 0 46 40" xmlns="http://www.w3.org/2000/svg">
+          <path d="M46 20.038c0-.7-.3-1.5-.8-2.1l-16-17c-1.1-1-3.2-1.4-4.4-.3-1.2 1.1-1.2 3.3 0 4.4l11.3 11.9H3c-1.7 0-3 1.3-3 3s1.3 3 3 3h33.1l-11.3 11.9c-1 1-1.2 3.3 0 4.4 1.2 1.1 3.3.8 4.4-.3l16-17c.5-.5.8-1.1.8-1.9z"></path>
+        </svg>
+      </span>
+    </div>
+  </button>
+
+  <div class="container">
+    <h1 class="header">Mines Assistant</h1>
+    <div class="wrapper">
+      <!-- Updated form structure with additional wrappers for mobile reordering -->
+      <form id="minesForm">
+        <div class="form-group">
+          <div class="mobile-row">
+            <label for="mines">Number of Mines:</label>
+            <input type="number" id="mines" name="mines" min="1" max="24" required />
+          </div>
+          <div class="mobile-row">
+            <label for="diamonds">Number of Diamonds:</label>
+            <input type="number" id="diamonds" name="diamonds" min="1" max="25" required />
+          </div>
+          <div class="mobile-row bet-row">
+            <label for="betSize">Bet Size:</label>
+            <input type="number" id="betSize" name="betSize" step="0.01" min="0.01" required />
+            <button type="button" onclick="doubleBet()">2x</button>
+            <button type="button" onclick="halveBet()">1/2</button>
+          </div>
+          <div class="mobile-row board-row">
+            <button type="button" onclick="generateMinesBoard()">Generate Mines Board</button>
+            <button type="button" id="randomizeButton" onclick="randomizeMinesAndDiamonds()">Randomize</button>
+          </div>
+        </div>
+        <div class="multiplier-container">
+          <div class="mobile-row">
+            <label for="multiplier">Multiplier:</label>
+            <input type="number" id="multiplier" name="multiplier" step="0.01" min="1" required oninput="updateWinAmount()" />
+          </div>
+          <div class="mobile-row">
+            <button type="button" id="generatePatternButton" onclick="generatePatternBasedOnMultiplier()">Generate Pattern</button>
+          </div>
+        </div>
+      </form>
+
+      <!-- Mines Board and results -->
+      <div id="minesBoard"></div>
+      <div id="minesResults"></div>
+      <div id="cursor" class="cursor"></div>
+    </div>
+    <footer class="site-footer">
+      <div class="footer-content">
+        <p>© 2024 GambleAssist. All rights reserved.</p>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // Add page transition when leaving
+    document.getElementById('backButton').addEventListener('click', function(e) {
+      e.preventDefault();
+      document.body.style.animation = 'pageTransitionOut 0.5s ease forwards';
+      setTimeout(() => {
+        window.location.href = '../index.html';
+      }, 500);
+    });
+
+    // Cursor effect and movement
+    const cursor = document.getElementById('cursor');
+    document.addEventListener('mousemove', (event) => {
+      const x = event.pageX;
+      const y = event.pageY;
+      cursor.style.left = `${x - 10}px`;
+      cursor.style.top = `${y - 10}px`;
+      const trail = document.createElement('div');
+      trail.className = 'trail';
+      trail.style.left = `${x - 5}px`;
+      trail.style.top = `${y - 5}px`;
+      document.body.appendChild(trail);
+      setTimeout(() => { trail.remove(); }, 500);
+    });
+
+    function factorial(number) {
+      let value = 1;
+      for (let i = number; i > 1; i--) { 
+        value *= i; 
+      }
+      return value;
+    }
+    function combination(n, d) {
+      if (n === d) return 1;
+      return factorial(n) / (factorial(d) * factorial(n - d));
+    }
+    function calculateResults(mines, diamonds) {
+      const totalCells = 25;
+      const safeCells = totalCells - mines;
+      const first = combination(totalCells, diamonds);
+      const second = combination(safeCells, diamonds);
+      const result = 0.99 * (first / second);
+      const minIncreaseOnLoss = 100 / (result - 1);
+      const winningChance = 99 / result;
+      return { multiplier: result, minIncreaseOnLoss, winningChance };
+    }
+    function findBestCombinationForMultiplier(targetMultiplier) {
+      const totalCells = 25;
+      let bestCombination = { mines: 0, diamonds: 0, multiplier: Infinity };
+      for (let mines = 1; mines < totalCells; mines++) {
+        for (let diamonds = 1; diamonds <= totalCells - mines; diamonds++) {
+          const { multiplier } = calculateResults(mines, diamonds);
+          if (Math.abs(multiplier - targetMultiplier) < Math.abs(bestCombination.multiplier - targetMultiplier)) {
+            bestCombination = { mines, diamonds, multiplier };
+          }
+        }
+      }
+      return bestCombination;
+    }
+    function calculateWinAmount(multiplier) {
+      const betSize = parseFloat(document.getElementById('betSize').value) || 0;
+      return betSize * multiplier;
+    }
+    let isPatternSwapped = false;
+    function generatePatternBasedOnMultiplier() {
+      const multiplierInput = parseFloat(document.getElementById('multiplier').value);
+      if (isNaN(multiplierInput) || multiplierInput < 1) {
+        alert("Please enter a valid multiplier greater than or equal to 1.");
+        return;
+      }
+      // Get best combination
+      const { mines, diamonds, multiplier } = findBestCombinationForMultiplier(multiplierInput);
+      // Toggle the order based on previous click
+      let generatedMines = isPatternSwapped ? diamonds : mines;
+      let generatedDiamonds = isPatternSwapped ? mines : diamonds;
+      // Update toggle flag for next click
+      isPatternSwapped = !isPatternSwapped;
+      
+      // Set the input values directly without reordering
+      document.getElementById('mines').value = generatedMines;
+      document.getElementById('diamonds').value = generatedDiamonds;
+      
+      // Generate board using the generated values
+      const totalCells = 25;
+      const cells = Array(totalCells).fill('');
+      let indices = Array.from({ length: totalCells }, (v, i) => i);
+      indices = indices.sort(() => Math.random() - 0.5);
+      for (let i = 0; i < generatedMines; i++) { 
+        cells[indices[i]] = 'mine'; 
+      }
+      for (let i = generatedMines; i < generatedMines + generatedDiamonds; i++) { 
+        cells[indices[i]] = 'diamond'; 
+      }
+      for (let i = 0; i < totalCells; i++) { 
+        if (cells[i] === '') { 
+          cells[i] = 'defaultDiamond'; 
+        } 
+      }
+      const board = document.getElementById('minesBoard');
+      board.innerHTML = '';
+      board.style.display = 'grid';
+      cells.forEach(cell => {
+        const cellDiv = document.createElement('div');
+        cellDiv.className = 'cell ' + cell;
+        board.appendChild(cellDiv);
+      });
+      window.patternMultiplier = multiplier;
+      window.minesBoardMultiplier = multiplier;
+      const winAmount = calculateWinAmount(multiplier);
+      const results = 
+        `<strong>${multiplier.toFixed(1)}x</strong><br>
+         <strong>Win Amount:</strong> <span id="winAmountDisplay">$${winAmount.toFixed(2)}</span><br>
+         <strong>Winning Chance:</strong> <span>${(calculateResults(generatedMines, generatedDiamonds).winningChance).toFixed(6)}%</span><br>
+         <strong>Minimal increase on loss:</strong> <span>x${(calculateResults(generatedMines, generatedDiamonds).minIncreaseOnLoss).toFixed(3)}</span>`;
+      document.getElementById('minesResults').innerHTML = results;
+      updateWinAmountDisplay();
+    }
+    function generateMinesBoard() {
+      const mines = parseInt(document.getElementById('mines').value);
+      const diamonds = parseInt(document.getElementById('diamonds').value);
+      if (!mines || !diamonds) {
+        document.getElementById('minesResults').innerHTML = "CHOOSE AMOUNT OF MINES AND DIAMONDS IDIOT";
+        return;
+      }
+      const totalCells = 25;
+      const cells = Array(totalCells).fill('');
+      if (mines + diamonds > totalCells) {
+        alert('Too many mines and diamonds!');
+        return;
+      }
+      let indices = Array.from({ length: totalCells }, (v, i) => i);
+      indices = indices.sort(() => Math.random() - 0.5);
+      for (let i = 0; i < mines; i++) { 
+        cells[indices[i]] = 'mine'; 
+      }
+      for (let i = mines; i < mines + diamonds; i++) { 
+        cells[indices[i]] = 'diamond'; 
+      }
+      for (let i = 0; i < totalCells; i++) { 
+        if (cells[i] === '') { 
+          cells[i] = 'defaultDiamond'; 
+        } 
+      }
+      const board = document.getElementById('minesBoard');
+      board.innerHTML = '';
+      board.style.display = 'grid';
+      cells.forEach(cell => {
+        const cellDiv = document.createElement('div');
+        cellDiv.className = 'cell ' + cell;
+        board.appendChild(cellDiv);
+      });
+      const { multiplier, minIncreaseOnLoss, winningChance } = calculateResults(mines, diamonds);
+      window.minesBoardMultiplier = multiplier;
+      window.patternMultiplier = multiplier;
+      const winAmount = calculateWinAmount(multiplier);
+      const results = 
+        `<strong>${multiplier.toFixed(2)}x</strong><br>
+         <strong>Win Amount:</strong> <span id="winAmountDisplay">$${winAmount.toFixed(2)}</span><br>
+         <strong>Winning Chance:</strong> <span>${winningChance.toFixed(6)}%</span><br>
+         <strong>Minimal increase on loss:</strong> <span>x${minIncreaseOnLoss.toFixed(5)}</span>`;
+      document.getElementById('minesResults').innerHTML = results;
+      updateWinAmountDisplay();
+    }
+    function doubleBet() {
+      const betInput = document.getElementById('betSize');
+      let currentBet = parseFloat(betInput.value);
+      currentBet = currentBet * 2;
+      betInput.value = currentBet < 1 ? currentBet.toFixed(4) : currentBet.toFixed(2);
+      updateWinAmountDisplay();
+    }
+    function halveBet() {
+      const betInput = document.getElementById('betSize');
+      let currentBet = parseFloat(betInput.value);
+      currentBet = currentBet / 2;
+      betInput.value = currentBet < 1 ? currentBet.toFixed(4) : currentBet.toFixed(2);
+      updateWinAmountDisplay();
+    }
+    function randomizeMinesAndDiamonds() {
+      const totalCells = 25;
+      let mines = Math.floor(Math.random() * 24) + 1;
+      let diamonds = Math.floor(Math.random() * (totalCells - mines)) + 1;
+      document.getElementById('mines').value = mines;
+      document.getElementById('diamonds').value = diamonds;
+      generateMinesBoard();
+      updateWinAmountDisplay();
+    }
+    function updateWinAmountDisplay() {
+      const betSize = parseFloat(document.getElementById('betSize').value) || 0;
+      const multiplier = window.minesBoardMultiplier || window.patternMultiplier || 1;
+      const winAmount = betSize * multiplier;
+      const winAmountElement = document.getElementById('winAmountDisplay');
+      if (winAmountElement) {
+        winAmountElement.textContent = `$${winAmount.toFixed(2)}`;
+      }
+    }
+    async function checkIfLive() {
+      try {
+        const response = await fetch('https://kick.com/api/v1/channels/enjayy');
+        const data = await response.json();
+        const isLive = data.livestream && data.livestream.is_live;
+        const statusText = document.getElementById('live-status-text');
+        if (isLive) { 
+          statusText.style.color = 'green'; 
+        } else { 
+          statusText.style.color = 'red'; 
+        }
+      } catch (error) {
+        console.error('Error fetching live status:', error);
+      }
+    }
+    checkIfLive();
+    document.getElementById('betSize').addEventListener('input', updateWinAmountDisplay);
+  </script>
+</body>
+</html>
