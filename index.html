@@ -320,7 +320,7 @@
     /* Cursor related styles */
     body,
     html {
-      cursor: none !important;
+      cursor: auto !important;
     }
 
     .cursor {
@@ -359,7 +359,7 @@
 
     /* Make sure links and buttons show the cursor effect */
     a, button, .button {
-      cursor: none !important;
+      cursor: pointer !important;
     }
 
     /* Adjust cursor size on interactive elements */
@@ -522,7 +522,7 @@
 
     @media (max-width: 600px) {
       .install-app-button {
-        display: block;
+        display: block !important;
       }
     }
   </style>
@@ -642,11 +642,9 @@
     let deferredPrompt;
     const installButton = document.getElementById('installButton');
 
-    // Only show install button on mobile
+    // Always show install button on mobile
     if (window.innerWidth <= 600) {
         installButton.style.display = 'block';
-    } else {
-        installButton.style.display = 'none';
     }
 
     window.addEventListener('beforeinstallprompt', (e) => {
