@@ -642,29 +642,51 @@
     let deferredPrompt;
     const installButton = document.getElementById('installButton');
 
+    // Check if device is iOS
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
     // Always show install button on mobile
     if (window.innerWidth <= 600) {
         installButton.style.display = 'block';
     }
 
     window.addEventListener('beforeinstallprompt', (e) => {
+        console.log('beforeinstallprompt event fired');
         e.preventDefault();
         deferredPrompt = e;
         installButton.style.display = 'block';
     });
 
     installButton.addEventListener('click', async () => {
+        if (isIOS) {
+            alert('To install this app:\n\n1. Tap the Share button (square with arrow)\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add" in the top right');
+            return;
+        }
+
+        console.log('Install button clicked');
         if (deferredPrompt) {
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') {
-                installButton.style.display = 'none';
+            console.log('Showing install prompt');
+            try {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`User response to the install prompt: ${outcome}`);
+                if (outcome === 'accepted') {
+                    console.log('User accepted the install prompt');
+                    installButton.style.display = 'none';
+                }
+                deferredPrompt = null;
+            } catch (error) {
+                console.error('Error during installation:', error);
+                alert('Installation failed. Please try again or check your browser settings.');
             }
-            deferredPrompt = null;
+        } else {
+            console.log('No deferred prompt available');
+            alert('Installation is not available at this time. Please try again later.');
         }
     });
 
     window.addEventListener('appinstalled', () => {
+        console.log('App was installed');
         installButton.style.display = 'none';
     });
 
@@ -676,6 +698,12 @@
             installButton.style.display = 'none';
         }
     });
+
+    // Check if the app is already installed
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+        console.log('App is already installed');
+        installButton.style.display = 'none';
+    }
   </script>
 </body>
 </html>
