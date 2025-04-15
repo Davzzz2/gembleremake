@@ -31,7 +31,7 @@
       opacity: 0;
       animation: pageTransitionIn 0.5s ease-out forwards;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
     }
 
@@ -135,11 +135,14 @@
     }
     
     h1 {
-      margin: 20px 0;
+      margin: 20px auto;
+      padding-top: 10px;
       font-size: 36px;
       position: relative;
       z-index: 2;
       text-shadow: 0 0 5px white;
+      width: 100%;
+      text-align: center;
     }
 
     .game-container {
@@ -497,7 +500,8 @@
       
       h1 {
         font-size: 24px;
-        margin: 40px 0 15px;
+        margin: 20px auto 15px;
+        padding-top: 5px;
       }
       
       #backButton {
@@ -1054,8 +1058,8 @@
         <div class="moveable-button" style="top: 190px; left: 519px; width: 193px;" data-multiplier="12">25 to 36</div>
         <div class="moveable-button" style="top: 233px; left: 77px; width: 82px;" data-multiplier="2">1 to 18</div>
         <div class="moveable-button" style="top: 233px; left: 187px; width: 82px;" data-multiplier="2">Even</div>
-        <div class="moveable-button red" style="top: 233px; left: 300px; width: 65px; padding: 17px;" data-multiplier="2"></div>
-        <div class="moveable-button black" style="top: 233px; left: 410px; width: 65px; padding: 17px;" data-multiplier="2"></div>
+        <div class="moveable-button red" style="top: 233px; left: 300px; width: 85px; padding: 17px;" data-multiplier="2"></div>
+        <div class="moveable-button black" style="top: 233px; left: 405px; width: 85px; padding: 17px;" data-multiplier="2"></div>
         <div class="moveable-button" style="top: 233px; left: 520px; width: 80px;" data-multiplier="2">Odd</div>
         <div class="moveable-button" style="top: 233px; left: 632px; width: 80px;" data-multiplier="2">19 to 36</div>
       </div>
