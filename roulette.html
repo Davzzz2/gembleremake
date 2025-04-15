@@ -268,14 +268,14 @@
       color: white;
       border-radius: 5px;
       position: relative;
-      border: 2px solid white;
-      box-shadow: 0 0 5px white;
+      z-index: 1;
     }
 
     .number-tile.green {
       background-color: #28a745;
       grid-row: 1 / span 3;
       grid-column: 1 / span 1;
+      z-index: 0;
     }
 
     .number-tile.red {
@@ -287,7 +287,7 @@
     }
 
     .button-tile {
-      background-color: rgba(44, 62, 80, 0.8);
+      background-color: #10242c;
       color: white;
       display: flex;
       justify-content: center;
@@ -297,9 +297,10 @@
       border-radius: 5px;
       cursor: pointer;
       text-align: center;
-      transition: all 0.3s;
-      border: 2px solid white;
-      box-shadow: 0 0 5px white;
+      transition: background-color 0.3s;
+      border: 2px solid #2b4353;
+      position: relative;
+      z-index: 2;
     }
 
     .button-tile:hover {
@@ -1175,9 +1176,12 @@ document.addEventListener('DOMContentLoaded', function() {
   const allTiles = document.querySelectorAll('.number-tile, .button-tile, .moveable-button');
   allTiles.forEach(tile => {
     tile.addEventListener('click', function(e) {
-      if (e.target === tile) {
-        placeCoinOnTile(tile, currentCoin);
+      e.stopPropagation(); // Prevent event bubbling
+      if (tile.classList.contains('button-tile')) {
+        // For 2:1 tiles, ensure they're clickable by adjusting z-index
+        tile.style.zIndex = '10';
       }
+      placeCoinOnTile(tile, currentCoin);
     });
   });
 
