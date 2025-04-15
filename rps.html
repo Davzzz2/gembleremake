@@ -477,7 +477,8 @@
   <div id="statsPanel">
     <div id="multiplierDisplay">Multiplier: 1.96x</div>
     <div id="winAmountDisplay">Win Amount: $0.02</div>
-    <div id="winChanceDisplay">Win Chance: 50.0000%</div>
+    <div id="winChanceDisplay">Win Chance: 33.33333333%</div>
+    <div id="oddsDisplay">1 in 3</div>
   </div>
 
   <script>
@@ -610,6 +611,15 @@
       4014.08, 8028.16, 16056.32, 32112.64, 64225.28,
       128450.56, 256901.12, 513802.24, 1027604.48
     ];
+
+    // Win chance percentages array (exact values)
+    const winChances = [
+      33.33333333, 11.11111111, 3.70370370, 1.23456790,
+      0.41152263, 0.13717421, 0.04572474, 0.01524158,
+      0.00508053, 0.00169351, 0.00056450, 0.00018817,
+      0.00006272, 0.00002091, 0.00000697, 0.00000232,
+      0.00000077, 0.00000026, 0.00000009, 0.00000003
+    ];
     
     // Current multiplier index (base on number of coins)
     let currentMultiplierIndex = 0;
@@ -618,6 +628,11 @@
     const multiplierDisplay = document.getElementById("multiplierDisplay");
     const winAmountDisplay = document.getElementById("winAmountDisplay");
     const winChanceDisplay = document.getElementById("winChanceDisplay");
+
+    // Function to calculate 1 in X odds from percentage
+    function calculateOdds(percentage) {
+      return Math.round(100 / percentage);
+    }
 
     // Function to update the stats panel
     function updateStats() {
@@ -639,9 +654,13 @@
         winAmountDisplay.textContent = "Win Amount: $" + winAmount.toFixed(4);
       }
       
-      // Calculate win chance: 50% for one coin; halves for each additional coin selected, displayed with 4 decimals
-      let winChance = 50 / Math.pow(2, index);
-      winChanceDisplay.textContent = "Win Chance: " + winChance.toFixed(4) + "%";
+      // Use exact win chance from array
+      const winChance = winChances[index];
+      winChanceDisplay.textContent = "Win Chance: " + winChance.toFixed(8) + "%";
+
+      // Calculate and display odds
+      const odds = calculateOdds(winChance);
+      document.getElementById('oddsDisplay').textContent = "1 in " + odds.toLocaleString();
     }
     
     // Initial update (remains hidden until coins are generated)
