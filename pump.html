@@ -43,7 +43,7 @@
           hsl(220, 70%, 12%) 50%,
           hsl(220, 100%, 1%) 100%
         );
-        color: white;
+        color: #ecf0f1;
         margin: 0;
         cursor: none;
         position: relative;
@@ -174,115 +174,82 @@
       }
 
       .container {
-        position: relative;
-        z-index: 2;
         padding-top: 100px;
         display: flex;
         flex-direction: column;
         align-items: center;
+        width: 100%;
+        max-width: 1200px;
       }
 
       h1 {
-        position: relative;
-        z-index: 3;
         margin: 20px 0;
-        text-shadow: 0 0 15px white;
       }
 
       .input-row {
         display: flex;
         align-items: center;
         margin-bottom: 20px;
-        margin-left: 0;
-        justify-content: center;
-        gap: 20px;
+        margin-left: 350px;
       }
 
       .form-group {
-        margin: 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+        margin: 0 10px;
       }
 
       .form-group input, .form-group select {
         padding: 5px;
         font-size: 16px;
-        border: 2px solid white;
+        border: none;
         border-radius: 5px;
         background-color: rgba(44, 62, 80, 0.8);
         color: white;
-        margin-top: 5px;
       }
 
-      @keyframes balloonPulse {
-        0% {
-          transform: scale(1);
-        }
-        50% {
-          transform: scale(1.05);
-        }
-        100% {
-          transform: scale(1);
-        }
+      .bet-amount {
+        position: absolute;
+        top: 20.2%;
+        left: 34%;
+        transform: translateY(-50%);
+        margin: 0;
       }
 
-      @keyframes textFade {
-        0% {
-          opacity: 0;
-          transform: translateY(-10px);
-        }
-        100% {
-          opacity: 1;
-          transform: translateY(0);
-        }
+      .bet-amount label,
+      .bet-amount input {
+        display: inline-block;
+        vertical-align: middle;
       }
 
-      .balloon {
-        position: relative;
-        z-index: 6;
-        width: 180px;
-        height: 200px;
-        background: linear-gradient(145deg, hsl(220, 73%, 63%), hsl(220, 73%, 63%));
-        border-radius: 50% 50% 45% 45%;
-        margin: 20px auto;
+      .bet-amount input {
+        width: 80px;
+        height: 25px;
+        padding: 3px;
+        min: 0.0001;
+        step: 0.01;
+      }
+
+      .bet-modifiers {
         display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 5px 15px white;
-        transition: background 0.5s ease;
+        justify-content: flex-start;
+        position: absolute;
+        top: 18.2%;
+        left: 44%;
+        margin: 0;
       }
 
-      .balloon.animate {
-        animation: balloonPulse 0.5s ease;
-      }
-
-      .balloon-text {
-        font-size: 24px;
-        font-weight: bold;
-        color: white;
-        text-shadow: 0 0 10px white;
-        z-index: 7;
-        opacity: 0;
-        transform: translateY(-10px);
-        transition: all 0.3s ease;
-      }
-
-      .balloon-text.animate {
-        animation: textFade 0.3s ease forwards;
+      .bet-modifiers button {
+        margin: 0 5px;
       }
 
       button {
-        position: relative;
-        z-index: 8;
         padding: 10px;
         font-size: 16px;
-        border: 2px solid white;
+        border: none;
         border-radius: 5px;
         background-color: rgba(44, 62, 80, 0.8);
         color: white;
         cursor: pointer;
-        box-shadow: 0 0 10px white;
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
         transition: background-color 0.3s ease, color 0.3s ease;
       }
 
@@ -292,94 +259,83 @@
       }
 
       .output {
-        margin: 20px 0;
+        margin-top: 20px;
         text-align: center;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
+        text-shadow: 0 0 5px rgba(255, 255, 255, 0.7);
       }
 
       #multiplierDisplay, #winAmountDisplay, #winChanceDisplay {
         margin: 5px 0;
         font-size: 20px;
-        text-shadow: 0 0 10px white;
+        text-shadow: 0 0 10px rgba(255, 255, 0, 0.8);
       }
 
-      #live-status-text {
-        font-weight: bold;
-      }
-
-      .bet-modifiers {
+      .balloon {
+        position: relative;
+        width: 180px;
+        height: 200px;
+        background: linear-gradient(145deg, #007bff, #3399ff);
+        border-radius: 50% 50% 45% 45%;
+        margin: 20px auto;
         display: flex;
-        justify-content: center;
-        gap: 10px;
-        margin: 20px 0;
-        position: static;
-      }
-
-      .bet-modifiers button {
-        margin: 0 5px;
-        padding: 10px;
-        font-size: 16px;
-        border: 2px solid white;
-        border-radius: 5px;
-        background-color: rgba(44, 62, 80, 0.8);
-        color: white;
-        cursor: pointer;
-        box-shadow: 0 0 10px white;
-        transition: background-color 0.3s ease, color 0.3s ease;
-      }
-
-      .bet-modifiers button:hover {
-        background-color: white;
-        color: rgba(44, 62, 80, 0.8);
-      }
-
-      .bet-amount {
-        position: static;
-        margin: 10px 0;
-        display: flex;
-        flex-direction: column;
         align-items: center;
+        justify-content: center;
+        box-shadow: 0 5px 15px rgba(255, 255, 255, 0.5);
       }
 
-      .bet-amount label,
-      .bet-amount input {
-        display: block;
-        text-align: center;
+      .balloon::after {
+        content: "";
+        position: absolute;
+        top: 30px;
+        right: 30px;
+        width: 25px;
+        height: 25px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
       }
 
-      .bet-amount input {
-        width: 100px;
-        height: 30px;
-        padding: 5px;
-        margin-top: 5px;
+      .knot {
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 30px;
+        height: 10px;
+        background: #007bff;
+        border-radius: 3px;
+      }
+
+      .balloon-text {
+        font-size: 24px;
+        font-weight: bold;
+        color: #fff;
+        text-shadow: 
+          0 0 2px rgba(255, 255, 255, 0.2),
+          0 0 4px rgba(255, 255, 255, 0.1);
+        z-index: 1;
       }
 
       .cursor {
-        position: fixed;
+        position: absolute;
         width: 20px;
         height: 20px;
-        background: radial-gradient(circle, rgba(255, 255, 255, 0.8), transparent);
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0));
         border-radius: 50%;
         pointer-events: none;
-        z-index: 9999;
-        mix-blend-mode: difference;
+        z-index: 1000;
       }
 
       .trail {
-        position: fixed;
+        position: absolute;
         width: 10px;
         height: 10px;
-        background: radial-gradient(circle, rgba(255, 255, 255, 0.6), transparent);
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0));
         border-radius: 50%;
         pointer-events: none;
-        z-index: 9998;
-        mix-blend-mode: difference;
+        z-index: 999;
         animation: fadeOut 0.5s forwards;
       }
 
-      /* Responsive Design */
       @media (max-width: 1200px) {
         .header-links {
           flex-wrap: wrap;
@@ -427,20 +383,11 @@
         
         .input-row {
           flex-direction: column;
-          gap: 15px;
+          align-items: center;
         }
         
         .form-group {
-          width: 100%;
-          max-width: 300px;
-        }
-        
-        .bet-modifiers {
-          flex-wrap: wrap;
-        }
-        
-        .bet-amount input {
-          width: 80px;
+          margin: 5px 0;
         }
         
         .balloon {
@@ -506,6 +453,67 @@
         }
       }
 
+      @media (max-width: 400px) {
+        h1 {
+          font-size: 1.5em;
+          margin-top: 65px;
+        }
+
+        #backButton {
+          top: 10px;
+          left: 10px;
+          width: 35px;
+          height: 35px;
+          font-size: 18px;
+        }
+
+        #game-container {
+          width: 100%;
+          padding: 10px;
+        }
+
+        .game-panel {
+          margin-bottom: 12px;
+        }
+
+        #bettingOptions .btn {
+          margin: 2px;
+          padding: 8px 12px;
+          font-size: 14px;
+        }
+
+        #graph-container {
+          height: 230px;
+        }
+
+        #crash-value {
+          font-size: 40px;
+        }
+
+        #multiplier-display {
+          font-size: 16px;
+        }
+
+        #betAmount, #autoConfig select, #autoConfig input {
+          padding: 6px;
+          font-size: 14px;
+        }
+
+        .panel-row {
+          flex-direction: column;
+        }
+
+        #strategy-panel .panel-content {
+          padding: 8px;
+        }
+
+        #history-list li {
+          padding: 6px;
+          margin-bottom: 4px;
+          font-size: 14px;
+        }
+      }
+
       @keyframes fadeOut {
         to {
           opacity: 0;
@@ -522,18 +530,13 @@
           <path d="M46 20.038c0-.7-.3-1.5-.8-2.1l-16-17c-1.1-1-3.2-1.4-4.4-.3-1.2 1.1-1.2 3.3 0 4.4l11.3 11.9H3c-1.7 0-3 1.3-3 3s1.3 3 3 3h33.1l-11.3 11.9c-1 1-1.2 3.3 0 4.4 1.2 1.1 3.3.8 4.4-.3l16-17c.5-.5.8-1.1.8-1.9z"></path>
         </svg>
       </span>
-      <span class="button-elem">
-        <svg viewBox="0 0 46 40">
-          <path d="M46 20.038c0-.7-.3-1.5-.8-2.1l-16-17c-1.1-1-3.2-1.4-4.4-.3-1.2 1.1-1.2 3.3 0 4.4l11.3 11.9H3c-1.7 0-3 1.3-3 3s1.3 3 3 3h33.1l-11.3 11.9c-1 1-1.2 3.3 0 4.4 1.2 1.1 3.3.8 4.4-.3l16-17c.5-.5.8-1.1.8-1.9z"></path>
-        </svg>
-      </span>
     </div>
   </button>
   <div class="header-links">
     <a href="https://www.youtube.com/@imenjayy" target="_blank">Enjayy's Youtube</a>
     <a href="https://discord.gg/enjayy" target="_blank">Enjayy's Discord</a>
     <a href="http://kick.com/enjayy" target="_blank">Enjayy's Kick <span id="live-status-text">LIVE</span></a>
-    <a href="http://stake.com/?c=penny" target="_blank">Code PENNY on Stake</a> <!-- New link added -->
+    <a href="http://stake.com/?c=penny" target="_blank">Code PENNY on Stake</a>
   </div>
   <div class="container">
     <h1>Pump Assistant</h1>
@@ -568,24 +571,20 @@
     <div class="output">
       <p id="multiplierDisplay">Multiplier: -</p>
       <p id="winAmountDisplay">Win Amount: -</p>
-      <p id="winChanceDisplay">Win Chance: -</p> <!-- Added win chance display -->
+      <p id="winChanceDisplay">Win Chance: -</p>
     </div>
     <div class="balloon" id="balloon">
-      <div class="balloon-text" id="balloonText">-</div> <!-- Show multiplier in the balloon -->
+      <div class="balloon-text" id="balloonText">-</div>
       <div class="knot"></div>
     </div>
-    <div class="cursor" id="cursor"></div> <!-- Custom Cursor -->
+    <div class="cursor" id="cursor"></div>
   </div>
 
   <script>
     // Add page transition for back button
     document.getElementById('backButton').addEventListener('click', function(e) {
       e.preventDefault();
-      document.body.style.animation = 'pageTransitionOut 0.5s ease forwards';
-      document.body.style.opacity = '1'; // Ensure body is visible before fade out
-      setTimeout(() => {
-        window.location.href = '../index.html';
-      }, 500);
+      window.location.href = '../index.html';
     });
 
     // Ensure body is visible before animation starts
@@ -710,25 +709,11 @@
 
     function randomizeMultiplier(difficulty, pumps) {
       const range = multipliers[difficulty].values;
-      return range[pumps - 1];  
+      return range[pumps - 1];
     }
 
     function updateBalloonAppearance(difficulty) {
       const balloon = document.getElementById("balloon");
-      const balloonText = document.getElementById("balloonText");
-      
-      // Remove previous animation classes
-      balloon.classList.remove('animate');
-      balloonText.classList.remove('animate');
-      
-      // Force reflow
-      void balloon.offsetWidth;
-      
-      // Add animation classes
-      balloon.classList.add('animate');
-      balloonText.classList.add('animate');
-      
-      // Update background color
       balloon.style.background = balloonColors[difficulty];
     }
 
@@ -747,37 +732,17 @@
       const winChance = selectedMultiplierData.winChance;
       const winAmount = (multiplier * betAmount).toFixed(2);
 
-      // Update displays with fade effect
-      const displays = [
-        document.getElementById("multiplierDisplay"),
-        document.getElementById("winAmountDisplay"),
-        document.getElementById("winChanceDisplay")
-      ];
-
-      displays.forEach(display => {
-        display.style.opacity = '0';
-        display.style.transform = 'translateY(-10px)';
-        setTimeout(() => {
-          display.style.transition = 'all 0.3s ease';
-          display.style.opacity = '1';
-          display.style.transform = 'translateY(0)';
-        }, 50);
-      });
-
       updateBalloonAppearance(difficulty);
-      document.getElementById("balloonText").innerText = `${multiplier}x`; 
-      document.getElementById("multiplierDisplay").innerText = `Multiplier: ${multiplier}x`; 
+      document.getElementById("balloonText").innerText = `${multiplier}x`;
+      document.getElementById("multiplierDisplay").innerText = `Multiplier: ${multiplier}x`;
       document.getElementById("winAmountDisplay").innerText = `Win Amount: $${winAmount}`;
-      document.getElementById("winChanceDisplay").innerText = `Win Chance: ${winChance}`; 
+      document.getElementById("winChanceDisplay").innerText = `Win Chance: ${winChance}`;
     }
 
     function randomize() {
       const difficulties = ["easy", "medium", "hard", "expert"];
-
       const randomDifficulty = difficulties[Math.floor(Math.random() * difficulties.length)];
-
       const maxPumpsForDifficulty = maxPumps[randomDifficulty];
-
       const randomPumps = Math.floor(Math.random() * maxPumpsForDifficulty) + 1;
 
       document.getElementById("difficulty").value = randomDifficulty;
@@ -800,7 +765,7 @@
       }
 
       if (pumpsSelect.options.length > 0) {
-        pumpsSelect.value = 1; 
+        pumpsSelect.value = 1;
       }
 
       generateMultiplier();
@@ -810,29 +775,29 @@
       const betInput = document.getElementById('betAmount');
       const currentBet = parseFloat(betInput.value);
       betInput.value = (currentBet * 2).toFixed(2);
-      generateMultiplier(); 
+      generateMultiplier();
     }
 
     function halveBet() {
       const betInput = document.getElementById('betAmount');
       let currentBet = parseFloat(betInput.value);
-
-      currentBet /= 2; 
-      betInput.value = currentBet.toString(); 
-      generateMultiplier(); 
+      currentBet /= 2;
+      betInput.value = currentBet.toString();
+      generateMultiplier();
     }
 
     window.onload = function() {
-      document.getElementById("balloonText").innerText = "-"; 
-      document.getElementById("betAmount").value = "0.01"; 
-      updatePumpOptions(); 
-      document.getElementById("difficulty").value = "easy"; 
-      document.getElementById("pumps").value = "1"; 
+      document.getElementById("balloonText").innerText = "-";
+      document.getElementById("betAmount").value = "0.01";
+      updatePumpOptions();
+      document.getElementById("difficulty").value = "easy";
+      document.getElementById("pumps").value = "1";
     };
 
     document.getElementById('betAmount').addEventListener('input', generateMultiplier);
     document.getElementById('pumps').addEventListener('change', generateMultiplier);
     document.getElementById('difficulty').addEventListener('change', updatePumpOptions);
+
     const cursor = document.getElementById("cursor");
     
     // Check if it is a mobile device
@@ -877,8 +842,8 @@
       }
     }
 
-    setInterval(checkIfLive, 5000); 
+    setInterval(checkIfLive, 5000);
   </script>
-<script src="../../cursor_fix.js"></script>
+  <script src="../../cursor_fix.js"></script>
 </body>
 </html>
