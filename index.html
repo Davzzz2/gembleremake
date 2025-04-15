@@ -248,7 +248,6 @@
     .coming-soon:hover {
       background-color: transparent;
       color: white;
-      cursor: default;
     }
 
     /* Floating particles */
@@ -495,9 +494,43 @@
         margin-bottom: 20px;
       }
     }
+
+    /* Install App Button Styles */
+    .install-app-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: hsla(var(--card), 0.8);
+      color: hsl(var(--primary));
+      border: 2px solid hsl(var(--primary));
+      padding: 15px 30px;
+      border-radius: var(--radius);
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 1000;
+      box-shadow: 0 0 20px hsla(var(--primary), 0.3);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: none;
+    }
+
+    .install-app-button:hover {
+      background-color: hsla(var(--card), 0.9);
+      box-shadow: 0 0 35px hsla(var(--primary), 0.5);
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 600px) {
+      .install-app-button {
+        display: block;
+      }
+    }
   </style>
 </head>
 <body>
+
+  <!-- Install App Button -->
+  <button class="install-app-button" id="installButton">Install App</button>
 
   <div class="image-container">
     <img src="gamble assist.png" alt="Gamble Assist" />
@@ -605,44 +638,46 @@
         cursor.style.display = 'block';
     });
 
-    // Install button code
+    // Install App Button Functionality
     let deferredPrompt;
-    const installButton = document.createElement('button');
-    installButton.textContent = 'Install App';
-    installButton.style.cssText = `
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      padding: 10px 20px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      z-index: 1000;
-    `;
-    document.body.appendChild(installButton);
-    installButton.style.display = 'none';
+    const installButton = document.getElementById('installButton');
+
+    // Only show install button on mobile
+    if (window.innerWidth <= 600) {
+        installButton.style.display = 'block';
+    } else {
+        installButton.style.display = 'none';
+    }
 
     window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      installButton.style.display = 'block';
+        e.preventDefault();
+        deferredPrompt = e;
+        installButton.style.display = 'block';
     });
 
     installButton.addEventListener('click', async () => {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        deferredPrompt = null;
-        installButton.style.display = 'none';
-      }
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                installButton.style.display = 'none';
+            }
+            deferredPrompt = null;
+        }
     });
 
     window.addEventListener('appinstalled', () => {
-      installButton.style.display = 'none';
+        installButton.style.display = 'none';
+    });
+
+    // Update install button visibility on window resize
+    window.addEventListener('resize', () => {
+        if (window.innerWidth <= 600) {
+            installButton.style.display = 'block';
+        } else {
+            installButton.style.display = 'none';
+        }
     });
   </script>
 </body>
 </html>
-
